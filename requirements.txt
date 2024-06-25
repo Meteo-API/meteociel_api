@@ -1,0 +1,7 @@
+bs4
+click
+datetime
+html5lib
+numpy
+pandas
+requests

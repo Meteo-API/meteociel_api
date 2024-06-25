@@ -12,6 +12,7 @@ Météociel API is a small Python API for the website [Météociel](https://www.
 ## Installation
 You can install this package from sources in a virtual environment by executing these commands in a terminal:
 ```
+$ git clone https://github.com/Meteo-API/meteociel_api.git
 $ cd meteociel_api
 $ python -m venv venv
 $ source venv/bin/activate
@@ -31,7 +32,7 @@ To use the CLI, you should start by creating a database for cities by entering: 
 
 In Python script, you have to start by creating the database too:
 ```python
-from meteociel.cities import generate_database()
+from meteociel.cities import generate_database
 generate_database()
 ```
 Then you are free to dump data with the modules: `meteociel.stations` and `meteociel.soundings`.
