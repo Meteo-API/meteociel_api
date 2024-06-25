@@ -1,0 +1,8 @@
+*.json
+*.csv
+__pycache__
+_build
+_static
+_templates
+meteociel_api.egg-info
+venv
