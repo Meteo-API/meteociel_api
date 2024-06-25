@@ -48,6 +48,6 @@ $ make html
 You can find the compiled html documentation in `meteociel_api/docs/_build/html/index.html`
 
 ## Licence
-This code is provided under the GNU General Public Licence v3.0+ (GPLv3+).
+This code is provided under the GNU General Public Licence v3.0 (GPLv3).
 
 Please refer to LICENCE file for further informations. 

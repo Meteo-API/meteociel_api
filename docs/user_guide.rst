@@ -5,7 +5,7 @@ Installing and configuring ``meteociel-api``
 --------------------------------------------
 First you have to install ``meteociel-api`` from the sources. It's recommanded to use a virtual environment::
 
-	$ git clone <url>
+	$ git clone https://github.com/Meteo-API/meteociel_api.git
 	$ cd meteociel_api
 	$ python -m venv venv
 	$ source venv/bin/activate
