@@ -43,6 +43,6 @@ dependencies = {file = ["requirements.txt"]}
 [project.scripts]
 meteociel = "meteociel.__main__:main"
 
-# [project.urls]
-# Homepage = ""
-# Documentation = ""
+[project.urls]
+Homepage = "https://github.com/Meteo-API/meteociel_api"
+Documentation = "http://meteociel-api.rtfd.io/"
