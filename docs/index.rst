@@ -40,11 +40,11 @@ You can also compile the documentation::
 Then, open the file ``meteociel_api/docs/_build/html/index.html``.
 
 
-Licence
+License
 -------
-This code is provided under the GNU General Public Licence v3.0+ (GPLv3+).
+This code is provided under the GNU General Public License v3.0+ (GPLv3+).
 
-Please refer to `LICENCE <https://github.com/Meteo-API/meteociel_api/blob/main/LICENSE>`_ file for further informations.
+Please refer to `LICENSE <https://github.com/Meteo-API/meteociel_api/blob/main/LICENSE>`_ file for further informations.
 
 
 Content

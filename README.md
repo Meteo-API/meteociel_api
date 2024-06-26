@@ -52,7 +52,7 @@ $ make html
 
 You can find the compiled html documentation in `meteociel_api/docs/_build/html/index.html`
 
-## Licence
-This code is provided under the GNU General Public Licence v3.0 (GPLv3).
+## License
+This code is provided under the GNU General Public License v3.0 (GPLv3).
 
-Please refer to [LICENCE](https://github.com/Meteo-API/meteociel_api/blob/main/LICENSE) file for further informations. 
+Please refer to [LICENSE](https://github.com/Meteo-API/meteociel_api/blob/main/LICENSE) file for further informations. 
