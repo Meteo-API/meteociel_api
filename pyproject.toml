@@ -9,13 +9,13 @@ authors = [
 	# {name="Manon PINTO"},
 	{name="Antoine ROYER"}
 ]
-description = "A Python API for Météociel website."
+description = " An unofficial API for the Météociel website"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.7"
 classifiers = [
 	"Programming Language :: Python :: 3",
 	"License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
-	"Development Status :: 2 - Pre-Alpha",
+	"Development Status :: 4 - Beta"
 ]
 dynamic = [
 	"version",
