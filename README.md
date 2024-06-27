@@ -3,7 +3,7 @@
 [![Documentation Status](https://readthedocs.org/projects/meteociel-api/badge/?version=latest)](https://meteociel-api.readthedocs.io/en/latest/?badge=latest)
 [![License](https://img.shields.io/github/license/Meteo-API/meteociel_api?color=green)](https://github.com/Meteo-API/meteociel_api/blob/main/LICENSE)
 [![Upload Python Package](https://github.com/Meteo-API/meteociel_api/actions/workflows/python-publish.yml/badge.svg)](https://github.com/Meteo-API/meteociel_api/actions/workflows/python-publish.yml)
-[![PyPi](https://img.shields.io/pypi/v/cra)](https://pypi.org/project/cra/)
+[![PyPi](https://img.shields.io/pypi/v/meteociel-api)](https://pypi.org/project/meteociel-api/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## Description
