@@ -5,6 +5,7 @@ from datetime import datetime
 
 import click
 import numpy as np
+import pandas as pd
 
 from meteociel import cities, forecasts, soundings, stations
 
@@ -87,6 +88,33 @@ def search_city(sounding, station, station_type, country, max_delta, name=""):
         keys["country"] = country
 
     click.echo(json.dumps(cities.get_city(name, keys=keys, max_delta=max_delta), indent=4))
+
+
+@click.command("quick-view")
+@click.argument("filename", type=click.STRING)
+def quick_view(filename: str):
+    """Display the content of a CSV file in the terminal."""
+    def adjust_length(string, length):
+        return string + abs(length - len(string)) * " "
+
+    with open(filename, "r", encoding="utf-8") as file:
+        dataframe = pd.read_csv(filename, delimiter=";")
+
+    data = dataframe.to_dict()
+    col_length = []
+    for key, col in list(data.items())[1: ]:
+        col_length.append(max(len(key), max(map(lambda x: len(str(x)), list(col.values())))))
+    
+    click.echo("  ".join([length * "=" for length in col_length]))
+    click.echo("  ".join(map(adjust_length, list(data.keys())[1: ], col_length)))
+    click.echo("  ".join([length * "=" for length in col_length]))
+    for _, row in dataframe.iterrows():
+        click.echo("  ".join([
+            adjust_length(str(row[key]), col_length[index])
+            for index, key in enumerate(list(data.keys())[1: ])
+        ]))
+
+    click.echo("  ".join([length * "=" for length in col_length]))
 
 
 # Data commands
