@@ -206,7 +206,12 @@ def get_data_from_html(
             if text := value.text:
                 data[index].append(text)
             elif img := value.find("img"):
-                data[index].append(img.attrs["alt"])
+                if "alt" in img.attrs:
+                    data[index].append(img.attrs["alt"])
+                elif "onmouseover" in img.attrs:
+                    data[index].append(img.attrs["onmouseover"])
+                else:
+                    data[index].append("")
             else:
                 data[index].append("")
 

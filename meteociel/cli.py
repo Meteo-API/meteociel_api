@@ -7,6 +7,7 @@ import click
 import numpy as np
 import pandas as pd
 
+import meteociel
 from meteociel import cities, forecasts, soundings, stations
 
 
@@ -21,6 +22,10 @@ def clean_city_name(city_name: str):
 
 
 # Utilitary commands
+@click.command("version")
+def version():
+    """Show the API version."""
+    click.echo(f"meteociel-api {meteociel.__version__}")
 
 
 @click.command("generate-database")
