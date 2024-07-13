@@ -23,7 +23,7 @@ def station_wind_dir(data):
     for i in data:
         start = i.find("(", 16) + 1
         end = i.find(")", start)
-        extracted_data.append(i[start: end])
+        extracted_data.append(i[start:end])
     return extracted_data
 
 

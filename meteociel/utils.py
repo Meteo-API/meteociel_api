@@ -4,6 +4,7 @@ Manages the functionalities required by other modules.
 
 from datetime import datetime
 
+import bs4
 import numpy as np
 import requests
 from bs4 import BeautifulSoup
@@ -144,9 +145,53 @@ def conv(
     return converted_data
 
 
-def get_data_from_html(
-    response: requests.models.Response, conditions: dict = None, *, skiprows: int = 0
-):
+def extract_data(html_data: bs4.element.Tag, *, skiprows: int = 0):
+    """
+    Extract data from html table into a lists of lists.
+
+    Parameters
+    ----------
+    html_data: bs4.element.Tag
+        The html table to be parsed.
+    skiprows : ``int``, keyword-only, optionnal
+        The number of row to skip at the begenning of the table.
+
+    Returns
+    -------
+    data : list
+        The list of lists that contains the data extracted from the html table.
+    """
+    data = []
+
+    # For each line of the table
+    for rowindex, line in enumerate(html_data.find_all("tr")):
+        # Skip the line
+        if rowindex < skiprows:
+            continue
+
+        # For each value in the line
+        for index, value in enumerate(line.find_all("td")):
+            # Add a new column if necessary
+            if len(data) <= index:
+                data.append([])
+
+            # Add the value into the right column
+            if text := value.text:
+                data[index].append(text)
+            elif img := value.find("img"):
+                if "alt" in img.attrs:
+                    data[index].append(img.attrs["alt"])
+                elif "onmouseover" in img.attrs:
+                    data[index].append(img.attrs["onmouseover"])
+                else:
+                    data[index].append("")
+            else:
+                data[index].append("")
+
+    return data
+
+
+def get_data_from_html(response: requests.models.Response, conditions: dict = None, **kwargs):
     """
     Search in the given ``response`` for a table that meet the given conditions and return the
     parsed data in a list where each element is a column of the html tabular.
@@ -157,8 +202,8 @@ def get_data_from_html(
         The response of the request.
     conditions : ``dict``, optionnal
         The conditions to meet. This dictionnary will be passed to ``BeautifulSoup.find``.
-    skiprows : ``int``, keyword-only, optionnal
-        The number of row to skip at the begenning of the table.
+    kwargs
+        The keyword-only arguments to be passed to ``extract_data``.
 
     Returns
     -------
@@ -188,31 +233,4 @@ def get_data_from_html(
             f"'{response.url}'"
         )
 
-    data = []
-
-    # For each line of the table
-    for rowindex, line in enumerate(html_data.find_all("tr")):
-        # Skip the line
-        if rowindex < skiprows:
-            continue
-
-        # For each value in the line
-        for index, value in enumerate(line.find_all("td")):
-            # Add a new column if necessary
-            if len(data) <= index:
-                data.append([])
-
-            # Add the value into the right column
-            if text := value.text:
-                data[index].append(text)
-            elif img := value.find("img"):
-                if "alt" in img.attrs:
-                    data[index].append(img.attrs["alt"])
-                elif "onmouseover" in img.attrs:
-                    data[index].append(img.attrs["onmouseover"])
-                else:
-                    data[index].append("")
-            else:
-                data[index].append("")
-
-    return data
+    return extract_data(html_data, **kwargs)
