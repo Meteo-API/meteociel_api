@@ -9,5 +9,6 @@ Functions
 	:maxdepth: 1
 
 	utils/conv
+	utils/extract_data
 	utils/get_data_from_html
 	utils/get_seconds
