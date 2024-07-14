@@ -111,7 +111,14 @@ def quick_view(filename: str):
         col_length.append(max(len(key), *[len(str(x)) for x in list(col.values())]))
 
     click.echo("  ".join([length * "=" for length in col_length]))
-    click.echo("  ".join(map(adjust_length, list(data.keys())[1:], col_length)))
+    click.echo(
+        "  ".join(
+            [
+                adjust_length(col_name, col_length[index])
+                for index, col_name in enumerate(list(data.keys())[1:])
+            ]
+        )
+    )
     click.echo("  ".join([length * "=" for length in col_length]))
     for _, row in dataframe.iterrows():
         click.echo(
