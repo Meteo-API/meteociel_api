@@ -15,6 +15,8 @@ Météociel API is a small Python API for the website [Météociel](https://www.
 
 * upper air sounding (simulated by AROME) (France only)
 
+* forecasts (mainly GFS, but others models are available)
+
 A full documentation is available on [ReadTheDocs](http://meteociel-api.rtfd.io/).
 
 ## Installation
@@ -49,13 +51,14 @@ generate_database()
 Then you are free to dump data with the modules: `meteociel.stations` and `meteociel.soundings`.
 
 ## Compiling documentation
-To compile documentation, you should have `make` installed on your computer. Then you can install the dependancies and compile:
+The compiled documentation can be found on [ReadTheDocs](http://meteociel-api.rtfd.io/).
+
+You can also locally compile the documentation. You should have `make` installed on your computer. Then you can install the dependancies and compile:
 ```bash
 $ cd meteociel_api/docs
 $ pip install -r requirements.txt
 $ make html
 ```
-
 You can find the compiled html documentation in `meteociel_api/docs/_build/html/index.html`
 
 ## License
