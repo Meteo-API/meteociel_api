@@ -4,6 +4,7 @@ Manage the extration of stations data.
 
 from datetime import datetime
 
+import numpy as np
 import pandas as pd
 from requests import get
 
@@ -100,9 +101,12 @@ def station(date: datetime, city_name: str):
             "bgcolor": "#EBFAF7",
         },
     )
-
     wind_dir = station_conv(station_wind_dir(data[-4][1:]))
-    wind_spd, wind_gust = station_conv(data[-3][1:])
+    try:
+        wind_spd, wind_gust = station_conv(data[-3][1:])
+    except ValueError:
+        wind_spd = [np.nan] * (len(data[0]) - 1)
+        wind_gust = [np.nan] * (len(data[0]) - 1)
     hour_name = "time (local)" if data[0][0] == "Heurelocale" else "time (GMT)"
 
     return city["names"][0], pd.DataFrame.from_dict(

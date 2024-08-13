@@ -226,7 +226,8 @@ def get_city(target_name: str, *, keys: dict = None, max_delta: int = 2):
     Returns
     -------
     match : ``dict``
-        The dictionnary that contains the cities that matched the search.
+        The dictionnary that contains the cities that matched the search, sorted by increasing
+        delta.
 
     Raises
     ------
@@ -292,13 +293,13 @@ def get_city(target_name: str, *, keys: dict = None, max_delta: int = 2):
 
     # Search for each known cities if the target is in the looked name
     target_name = target_name.lower()
-    matches = {}
+    matches = []
     for city_id, city in json_data.items():
-        if (
-            check_name(target_name, city["names"])
-            or get_delta(target_name, city["names"]) <= max_delta
-        ) and check_keys(keys, city):
-            matches[city_id] = city
+        delta = get_delta(target_name, city["names"])
+        if (check_name(target_name, city["names"]) or delta <= max_delta) and check_keys(
+            keys, city
+        ):
+            matches.append((delta, city_id, city))
 
     if not matches:
         raise CityNotFoundError(
@@ -311,5 +312,5 @@ def get_city(target_name: str, *, keys: dict = None, max_delta: int = 2):
     #         "several cities matches your query:\n" +
     #         "\n".join([f"{city}" for city in matches.values()])
     #     )
-
-    return matches
+    matches = sorted(matches, key=lambda x: x[0])
+    return {city_id: city for _, city_id, city in matches}
