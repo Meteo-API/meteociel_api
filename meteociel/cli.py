@@ -6,6 +6,8 @@ from datetime import datetime
 import click
 import numpy as np
 import pandas as pd
+from rich.console import Console
+from rich.table import Table
 
 import meteociel
 from meteociel import cities, forecasts, soundings, stations
@@ -99,38 +101,17 @@ def search_city(sounding, station, station_type, country, max_delta, name=""):
 @click.argument("filename", type=click.STRING)
 def quick_view(filename: str):
     """Display the content of a CSV file in the terminal."""
-
-    def adjust_length(string, length):
-        return string + abs(length - len(string)) * " "
-
     dataframe = pd.read_csv(filename, delimiter=";")
 
-    data = dataframe.to_dict()
-    col_length = []
-    for key, col in list(data.items())[1:]:
-        col_length.append(max(len(key), *[len(str(x)) for x in list(col.values())]))
+    table = Table(title=filename)
+    for column_name in dataframe.columns[1: ]:
+        table.add_column(column_name)
 
-    click.echo("  ".join([length * "=" for length in col_length]))
-    click.echo(
-        "  ".join(
-            [
-                adjust_length(col_name, col_length[index])
-                for index, col_name in enumerate(list(data.keys())[1:])
-            ]
-        )
-    )
-    click.echo("  ".join([length * "=" for length in col_length]))
-    for _, row in dataframe.iterrows():
-        click.echo(
-            "  ".join(
-                [
-                    adjust_length(str(row[key]), col_length[index])
-                    for index, key in enumerate(list(data.keys())[1:])
-                ]
-            )
-        )
+    for row in dataframe.iterrows():
+        table.add_row(*[str(i) for i in row[1][1:]])
 
-    click.echo("  ".join([length * "=" for length in col_length]))
+    console = Console()
+    console.print(table)
 
 
 # Data commands

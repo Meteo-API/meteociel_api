@@ -5,3 +5,4 @@ html5lib
 numpy
 pandas
 requests
+rich
