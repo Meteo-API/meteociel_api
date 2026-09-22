@@ -79,7 +79,7 @@ def get_station_cities():
 
             # Get station type
             code1, code2 = int(fields[2]), int(fields[4])
-            station_type = "inactive" if (code1, code2) == (1, 1) else known_station_types[code1]
+            station_type = "inactive" if (code1 == 1 or code2 == 1) else known_station_types[code1]
 
             # Get country
             if deptpays.startswith("dept"):
