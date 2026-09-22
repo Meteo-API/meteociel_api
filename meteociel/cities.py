@@ -68,7 +68,7 @@ def get_station_cities():
         if not response.ok:
             raise ConnectionError(f"connection failed with code: {response.status_code}")
 
-        known_station_types = ("synop", "metar", "amateur", "secondaire")
+        # known_station_types = ("synop", "metar", "amateur", "secondaire")
 
         # For each city
         for city in response.text.splitlines():
@@ -78,8 +78,10 @@ def get_station_cities():
             city_name = fields[1].lower()[: fields[1].find("(") - 1]
 
             # Get station type
-            code1, code2 = int(fields[2]), int(fields[4])
-            station_type = "inactive" if (code1 == 1 or code2 == 1) else known_station_types[code1]
+            # code1, code2 = int(fields[2]), int(fields[4])
+            # station_type = (
+            #     "N/A"  # "inactive" if (code1, code2) == (1, 1) else known_station_types[code1]
+            # )
 
             # Get country
             if deptpays.startswith("dept"):
@@ -87,7 +89,7 @@ def get_station_cities():
 
             cities[fields[0]] = {
                 "names": city_name.split(" / "),
-                "station-type": station_type,
+                # "station-type": station_type,
                 "country": deptpays,
             }
 
@@ -104,22 +106,8 @@ def generate_database():
             "names"       : ["name1", "name2", ...],
             "has-sounding": bool (True or False)
             "has-station" : ``bool`` (True or False),
-            "station-type": can be "synop", "metar", "secondaire", "amateur", "inactive" or "N/A"
-                            if no station
             "country"     : ``the`` country can be "N/A" if unknown
         }
-
-    Types of station:
-
-    * ``synop`` are main stations;
-
-    * ``metar`` are stations used by aviation;
-
-    * ``secondaire`` are secondary stations;
-
-    * ``amateur`` are stations maintained by non-professionnal;
-
-    * ``inactive`` are stations that doesn't emit anymore.
 
     .. warning::
         This function need to gather thousand cities, so its execution can take several seconds.
@@ -145,7 +133,6 @@ def generate_database():
                 "names": list({*station_city["names"], *sounding_city["names"]}),
                 "has-sounding": True,
                 "has-station": True,
-                "station-type": station_city["station-type"],
                 "country": station_city["country"],
             }
 
@@ -155,7 +142,6 @@ def generate_database():
                 "names": station_city["names"],
                 "has-sounding": False,
                 "has-station": True,
-                "station-type": station_city["station-type"],
                 "country": station_city["country"],
             }
 
@@ -166,7 +152,6 @@ def generate_database():
                 "names": sounding_city["names"],
                 "has-sounding": True,
                 "has-station": False,
-                "station-type": "N/A",
                 "country": "N/A",
             }
 
@@ -253,7 +238,6 @@ def get_city(target_name: str, *, keys: dict = None, max_delta: int = 2):
                 ],
                 "has-sounding": true,
                 "has-station": true,
-                "station-type": "synop",
                 "country": "france"
             },
             "7752": {
@@ -273,7 +257,6 @@ def get_city(target_name: str, *, keys: dict = None, max_delta: int = 2):
                 ],
                 "has-sounding": true,
                 "has-station": true,
-                "station-type": "synop"
                 "country": "france"
             }
         }

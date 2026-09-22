@@ -10,6 +10,18 @@ import requests
 from bs4 import BeautifulSoup
 
 
+class TooManyCitiesError(Exception):
+    """If several cities can match the search."""
+
+
+class UnknownModeError(Exception):
+    """The given mode is unknown."""
+
+
+class UnknownModelError(Exception):
+    """The given model is unknown."""
+
+
 def get_seconds(
     date: datetime,
     ref_string: str = "1970-01-01 01:00",
@@ -154,7 +166,7 @@ def extract_data(html_data: bs4.element.Tag, *, skiprows: int = 0):
     html_data: bs4.element.Tag
         The html table to be parsed.
     skiprows : ``int``, keyword-only, optionnal
-        The number of row to skip at the begenning of the table.
+        By default: ``0``. The number of row to skip at the begenning of the table.
 
     Returns
     -------

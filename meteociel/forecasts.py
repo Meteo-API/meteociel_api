@@ -13,21 +13,10 @@ from requests import get
 
 from meteociel import utils
 
+
 MODES = ("forecasts", "trends")
 
 MODELS = ("gfs", "wrf", "wrf-1h", "arome", "arome-1h", "arpege-1h", "iconeu", "icond2")
-
-
-class TooManyCitiesError(Exception):
-    """If several cities can match the search."""
-
-
-class UnknownModeError(Exception):
-    """The given mode is unknown."""
-
-
-class UnknownModelError(Exception):
-    """The given model is unknown."""
 
 
 def forecast_conv(data):
@@ -77,6 +66,7 @@ def get_forecast_url(
 
     Exemples
     --------
+    ::
 
         >>> from meteociel.forecasts import get_forecast_url
         >>> url = get_forecast_url(city_name="Toulouse 31000", mode="forecasts", model="gfs")
@@ -121,7 +111,7 @@ def get_forecast_url(
             cities.append(f"- {name}")
 
         # If the city hasn't been found
-        raise TooManyCitiesError(
+        raise utils.TooManyCitiesError(
             f"too many cities can match your search, please choose one city in the "
             f"following list:\n{'\n'.join(cities)}"
         )
@@ -257,7 +247,7 @@ def forecast(
     Extraction of Paris (France) weather forecasts data with the hourly arome model::
 
         >>> from meteociel.forecasts import forecast
-        >>> city_name, data = forecast(city_name="Paris (75000)", model="arome-1h")
+        >>> city_name, date, data = forecast(city_name="Paris (75000)", model="arome-1h")
         >>> data
                           date  temperature  windchill  ...  rain  humidity  pressure
         0  2024-06-23 03:00:00         15.0       15.0  ...     0      80.0    1019.0
@@ -272,7 +262,7 @@ def forecast(
     Extraction of weather trends by id (here for Berlin, Germany)::
 
         >>> from meteociel.forecasts import forecast
-        >>> city_name, data = forecast(city_id=49679, mode="trends")
+        >>> city_name, date, data = forecast(city_id=49679, mode="trends")
         >>> city_name
         berlin
         >>> data
@@ -288,13 +278,13 @@ def forecast(
 
     """
     if mode not in MODES:
-        raise UnknownModeError(
+        raise utils.UnknownModeError(
             f"'{mode}' isn't a valid mode, please report to the documentation to see the available "
             f"modes"
         )
 
     if model not in MODELS:
-        raise UnknownModelError(
+        raise utils.UnknownModelError(
             f"'{model}' isn't a valid model, please report to the documentation to see the "
             f"available models"
         )
@@ -329,7 +319,7 @@ def forecast(
             except ValueError:
                 rain.append(np.nan)
 
-    return city_name, pd.DataFrame.from_dict(
+    data = pd.DataFrame.from_dict(
         {
             "date": data[0],
             "temperature": forecast_conv(data[1]),
@@ -343,3 +333,9 @@ def forecast(
             # "weather": data[9],
         }
     )
+
+    date = data["date"].values
+    date_start = str(np.datetime_as_string(date[0], "h")).replace("-", "")
+    date_end = str(np.datetime_as_string(date[-1], "h")).replace("-", "")
+
+    return city_name, f"{date_start}loc-{date_end}loc", data

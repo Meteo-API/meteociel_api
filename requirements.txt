@@ -2,6 +2,7 @@ bs4
 click
 datetime
 html5lib
+matplotlib>=3.11
 numpy
 pandas
 requests

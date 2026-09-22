@@ -6,7 +6,6 @@ build-backend = "setuptools.build_meta"
 name = "meteociel-api"
 authors = [
 	{name="Gabriel HAUSKNOST"},
-	# {name="Manon PINTO"},
 	{name="Antoine ROYER"}
 ]
 description = " An unofficial API for the Météociel website"

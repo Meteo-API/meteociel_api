@@ -11,7 +11,7 @@ import sys
 sys.path.insert(0, os.path.abspath('../meteociel'))
 
 project = 'Météociel API'
-copyright = '2024, Gabriel HAUSKNOST and Antoine ROYER'
+copyright = '2026, Gabriel HAUSKNOST and Antoine ROYER'
 author = 'Gabriel HAUSKNOST and Antoine ROYER'
 
 # -- General configuration ---------------------------------------------------

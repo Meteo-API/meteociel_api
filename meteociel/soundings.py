@@ -10,7 +10,11 @@ from requests import get
 
 from meteociel import cities, utils
 
+
 AVAILABLE_OBS_HOURS = (0, 6, 12, 18)
+
+MODELS = ("arome", "gfs", "wrf")
+
 
 
 def sounding_conv(data):
@@ -36,10 +40,12 @@ def sounding_obs(date: datetime, city_name: str):
 
     Returns
     -------
-    out : ``tuple(str, pd.DataFrame)``
+    out : ``tuple(str, str, pd.DataFrame)``
         A tuple that contains two elements:
 
         * the name of the city
+
+        * the date of the sounding
 
         * A DataFrame that contains all the variables from the sounding.
 
@@ -48,11 +54,11 @@ def sounding_obs(date: datetime, city_name: str):
 
         >>> from datetime import datetime
         >>> from meteociel.soundings import sounding_obs
-        >>> city_name, data = sounding_obs(
+        >>> city_name, date, data = sounding_obs(
         ...     datetime.strptime("2022-08-18 00", "%Y-%m-%d %H"), "Ajaccio"
         ... )
         >>> city_name
-        'ajaccio'
+        'ajaccio - campo dell'oro'
         >>> data
               altitude  pressure  temperature  ...  dew_point     wind_u     wind_v
         0          5.0    1006.0         25.1  ...       18.1  28.342661  19.845745
@@ -104,8 +110,8 @@ def sounding_obs(date: datetime, city_name: str):
         {
             "cellpadding": "2",
             "style": (
-                "border-collapse: collapse; background-color: #80ffff; text-align:center; "
-                "font-family: Verdana; font-size: 8pt"
+                "border-collapse: collapse; border-color: gray; background-color: #80ffff; "
+                "text-align:center; font-family: Verdana; font-size: 8pt"
             ),
             "border": "1",
         },
@@ -114,8 +120,13 @@ def sounding_obs(date: datetime, city_name: str):
 
     wind_dir, wind_spd = sounding_conv(data[6])
 
+    date = (
+        f"{date.year}{str(date.month).zfill(2)}{str(date.day).zfill(2)}"
+        f"T{str(date.hour).zfill(2)}loc"
+    )
+
     # Return a DataFrame
-    return city["names"][0], pd.DataFrame.from_dict(
+    return city["names"][0], date, pd.DataFrame.from_dict(
         {
             "altitude": sounding_conv(data[0])[::-1],
             "pressure": sounding_conv(data[1])[::-1],
@@ -129,9 +140,16 @@ def sounding_obs(date: datetime, city_name: str):
     )
 
 
-def sounding_arome(*, lon: float = None, lat: float = None, city_name: str = "", timestep: int = 1):
+def sounding_model(
+    *,
+    lon: float = None,
+    lat: float = None,
+    city_name: str = "",
+    timestep: int = 1,
+    model: str=MODELS[0],
+):
     """
-    Extract the data of the upper air sounding simulated by the AROME model. You can pass
+    Extract the data of the upper air sounding simulated by a model. You can pass
     coordinates or a city name. If you pass both, the city name will take priority.
 
     Parameters
@@ -143,14 +161,24 @@ def sounding_arome(*, lon: float = None, lat: float = None, city_name: str = "",
     city_name : ``str``, keyword-only,  optionnal
         By default: ``""``. The name of the city where the simulated sounding is to be extracted.
     timestep : ``int``, keyword-only, optionnal
-        By default: ``1``. The number of hours elapsed since the start of the AROME run.
+        By default: ``1``. The number of hours elapsed since the start of the run.
+    model : ``str``, keyword-only, optionnal
+        By default: ``"arome"``. The mode to be used to get the sounding. Can be:
+
+        * arome
+
+        * gfs
+
+        * wrf
 
     Returns
     -------
-    out : ``tuple(str, pd.DataFrame)``
+    out : ``tuple(str, str, pd.DataFrame)``
         A tuple that contains two elements:
 
         * the name of the city
+
+        * the date of the sounding
 
         * A DataFrame that contains all the variables from the sounding.
 
@@ -158,11 +186,11 @@ def sounding_arome(*, lon: float = None, lat: float = None, city_name: str = "",
     --------
     From city name::
 
-        >>> from meteociel.soundings import sounding_arome
-        >>> data = sounding_arome(city_name="Rennes")
-        >>> data[0]  # city name
+        >>> from meteociel.soundings import sounding_model
+        >>> city_name, date, data = sounding_model(city_name="Rennes")
+        >>> city name
         'Rennes'
-        >>> data[1]  # the sounding data
+        >>> data
             altitude  pressure  temperature  ...      wind_v
         0       40.0    1018.0         14.0  ...  -28.123613
         1       58.0    1015.0         13.9  ...  -43.175688
@@ -175,8 +203,8 @@ def sounding_arome(*, lon: float = None, lat: float = None, city_name: str = "",
 
     From coordinates and with 12 hours of run::
 
-        >>> from meteociel.soundings import sounding_arome
-        >>> data = sounding_arome(lon=5, lat=42, timestep=12)
+        >>> from meteociel.soundings import sounding_model
+        >>> data = sounding_model(lon=5, lat=42, timestep=12)
         >>> data[0]
         '42N-5E'
         >>> data[1]
@@ -213,27 +241,73 @@ def sounding_arome(*, lon: float = None, lat: float = None, city_name: str = "",
         city_name = f"{lat}N-{lon}E"
 
     # Get the data
-    response = get(
-        "https://www.meteociel.fr/modeles/sondage2arome.php",
-        params={
-            "archive": 0,
-            "ech": timestep,
-            "map": 4,
-            "wrf": 0,
-            "region": "",
-            "type": 1,
-            "lon": lon,
-            "lat": lat,
-        },
-        timeout=10,
-    )
+    if model == "arome":
+        if timestep not in range(1, 52):
+            raise ValueError(
+                "unavailable timestep for the arome model, please see "
+                "https://www.meteociel.fr/modeles/sondage_arome.php to see the available timesteps"
+            )
+
+        response = get(
+            "https://www.meteociel.fr/modeles/sondage2arome.php",
+            params={
+                "archive": 0,
+                "ech": timestep,
+                "map": 4,
+                "lon": lon,
+                "lat": lat,
+            },
+            timeout=10,
+        )
+
+    elif model == "gfs":
+        if timestep not in (list(range(3, 87, 3)) + list(range(84, 198, 6))):
+            raise ValueError(
+                "unavailable timestep for the gfs model, please see "
+                "https://www.meteociel.fr/modeles/sondage_gfs.php to see the available timesteps"
+            )
+
+        response = get(
+            "https://www.meteociel.fr/modeles/sondage2.php",
+            params={
+                "archive": 0,
+                "ech": timestep,
+                "map": 4,
+                "lon": lon,
+                "lat": lat,
+            },
+            timeout=10,
+        )
+
+    elif model == "wrf":
+        if timestep not in range(1, 97):
+            raise ValueError(
+                "unavailable timestep for the gfs model, please see "
+                "https://www.meteociel.fr/modeles/sondage_wrf.php to see the available timesteps"
+            )
+
+        response = get(
+            "https://www.meteociel.fr/modeles/sondage2wrf.php",
+            params={
+                "archive": 0,
+                "ech": timestep,
+                "map": 4,
+                "lon": lon,
+                "lat": lat,
+            },
+            timeout=10,
+        )
+
+    else:
+        raise utils.UnknownModelError(f"the model {model!r} isn't known or implemented")
+
     data = utils.get_data_from_html(
         response,
         {
             "cellpadding": "2",
             "style": (
-                "border-collapse: collapse; background-color: #80ffff; text-align:center; "
-                "font-family: Verdana; font-size: 8pt"
+                "border-collapse: collapse; border-color: gray; background-color: #80ffff; "
+                "text-align:center; font-family: Verdana; font-size: 8pt"
             ),
             "border": "1",
         },
@@ -258,15 +332,14 @@ def sounding_arome(*, lon: float = None, lat: float = None, city_name: str = "",
     }
 
     date = (
-        f"{metadata[6]}{month[metadata[5]]}{str(metadata[4]).zfill(2)}{metadata[1]}+{timestep}h"
-        if metadata
-        else ""
+        f"{metadata[6]}{month[metadata[5]]}{str(metadata[4]).zfill(2)}T{metadata[1]}+{timestep}h"
+        if metadata else ""
     )
 
     wind_dir, wind_spd = sounding_conv(data[6])
 
     # Return a DataFrame
-    return f"{city_name}_{date}", pd.DataFrame.from_dict(
+    return city_name, date, pd.DataFrame.from_dict(
         {
             "altitude": sounding_conv(data[0])[::-1],
             "pressure": sounding_conv(data[1])[::-1],
@@ -274,7 +347,7 @@ def sounding_arome(*, lon: float = None, lat: float = None, city_name: str = "",
             "wetbulb_temperature": sounding_conv(data[3])[::-1],
             "dew_point": sounding_conv(data[4])[::-1],
             "humidity": sounding_conv(data[5])[::-1],
-            "wind_u": -wind_spd * np.sin(np.radians(wind_dir))[::-1],
-            "wind_v": -wind_spd * np.cos(np.radians(wind_dir))[::-1],
+            "wind_u": (-wind_spd * np.sin(np.radians(wind_dir)))[::-1],
+            "wind_v": (-wind_spd * np.cos(np.radians(wind_dir)))[::-1],
         }
     )

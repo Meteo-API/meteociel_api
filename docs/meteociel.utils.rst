@@ -3,6 +3,15 @@ Utilities (``meteociel.utils``)
 .. automodule:: meteociel.utils
 	:ignore-module-all:
 
+Exceptions
+----------
+.. toctree::
+	:maxdepth: 1
+
+	utils/TooManyCitiesError
+	utils/UnknownModeError
+	utils/UnknownModelError
+
 Functions
 ---------
 .. toctree::

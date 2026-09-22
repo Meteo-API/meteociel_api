@@ -46,19 +46,22 @@ def station(date: datetime, city_name: str):
 
     Returns
     -------
-    out : ``tuple(str, pd.DataFrame)``
+    out : ``tuple(str, str, pd.DataFrame)``
         A tuple that contains two elements:
 
         * the name of the city
+
+        * the date of the measurements
 
         * A DataFrame that contains all the variables from the stations.
 
     Exemples
     --------
+    ::
 
         >>> from datetime import datetime
         >>> from meteociel.stations import station
-        >>> city_name, data = station(datetime.strptime("2022-08-18", "%Y-%m-%d"), "Ajaccio")
+        >>> city_name, date, data = station(datetime.strptime("2022-08-18", "%Y-%m-%d"), "Ajaccio")
         >>> city_name
         'ajaccio'
         >>> data
@@ -107,9 +110,9 @@ def station(date: datetime, city_name: str):
     except ValueError:
         wind_spd = [np.nan] * (len(data[0]) - 1)
         wind_gust = [np.nan] * (len(data[0]) - 1)
-    hour_name = "time (local)" if data[0][0] == "Heurelocale" else "time (GMT)"
+    hour_name = "time (local)" if data[0][0] == "Heurelocale" else "time (UTC)"
 
-    return city["names"][0], pd.DataFrame.from_dict(
+    return city['names'][0], date.strftime('%Y%m%d'), pd.DataFrame.from_dict(
         {
             hour_name: data[0][1:][::-1],
             "visibility": station_conv(data[-10][1:])[::-1],

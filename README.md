@@ -13,7 +13,7 @@ Météociel API is a small Python API for the website [Météociel](https://www.
 
 * upper air sounding (observations) (Western Europe only)
 
-* upper air sounding (simulated by AROME) (France only)
+* upper air sounding (simulated) (France only)
 
 * forecasts (mainly GFS, but others models are available)
 
